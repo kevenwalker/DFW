@@ -11,7 +11,8 @@
 #define CLI_SHOW_VERSION "version"
 #define CLI_SHOW_PLAYER "player"
 /* show¿‡√¸¡Ó∞Ô÷˙ */
-#define CLI_SHOW_MAP_HELP       "show map                         -- print the map data info.\n"
+#define CLI_SHOW_MAP_HELP       "show map [verbose]               -- print the map data info.\n" \
+                                "                                 -- verbose is optional.\n"
 #define CLI_SHOW_HELP_INFO      "show help                        -- print the help info.\n"
 #define CLI_SHOW_VERSION_INFO   "show version                     -- print the version.\n"
 #define CLI_SHOW_PLAYER_INFO    "show player                      -- print all the players info.\n"

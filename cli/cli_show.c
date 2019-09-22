@@ -53,24 +53,23 @@ void INTF_RunShowHandle(char **argv, int argc)
     return;
 }
 
+/* œ‘ æµÿÕº */
 int CLI_showMap(char **argv, int argc)
 {
     int result;
     MapInfo *mapInfo = NULL;
-    char cmdVal[PARAMLEN] = {0};
+    assert(argv != NULL);
+    if (argc < 1 || argc > 2) {
+        LOG_TRESS(TRC_LEVEL_ERROR, "Parameters are invalid.\n");
+        return DFW_FAILED;
+    }
     mapInfo = INTF_MAP_getMap();
     if (mapInfo == NULL) {
         LOG_TRESS(TRC_LEVEL_ERROR, "Get the mapInfo failed.\n");
         return DFW_FAILED;
     }
     INTF_MAP_DisplayMap(mapInfo);
-    if (argc >= 1) {
-        result = INTF_MISC_GetParamByEqual(argv[i], strlen(argv[i]), MISC_BEFORE, cmdVal, PARAMLEN);
-        if (result != DFW_SUCCESS) {
-            printf("Execute the command is failed.\n");
-            return DFW_TRUE;
-        }
-        
+    if (argc == 2 && strcmp(argv[1],"verbose") == 0) {
         INTF_MAP_DisplayDataInfo();
     }
     return DFW_SUCCESS;
