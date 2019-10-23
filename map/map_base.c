@@ -5,24 +5,38 @@
 void INTF_MAP_DisplayMap(MapInfo* mapInfo)
 {
     int i;
-    int j;
+    ListEntry *tmp = NULL;
+    ListEntry *cur = NULL;
+    ELM_Player *player = NULL;
+    char **mapData = NULL;
     if (mapInfo == NULL) {
         return;
     }
+    mapData = (char**)malloc(sizeof(char*) * mapInfo->width);
     for (i = 0; i < mapInfo->width; i++) {
-        if (i == 0 || i == mapInfo->width - 1) {
-            for (j = 0; j < mapInfo->length; j++) {
-                printf("%c", mapInfo->type);
-            }
-            printf("\n");
-        } else {
-            printf("%c", mapInfo->type);
-            for (j = 1; j < mapInfo->length - 1; j++) {
-                printf(" ");
-            }
-            printf("%c\n", mapInfo->type);
-        }
+        mapData[i] = (char*)malloc(sizeof(char) * mapInfo->length + 1);
+        memset(mapData[i], ' ', mapInfo->length);
+        mapData[i][mapInfo->length] = '\0';
     }
+
+    for (i = 0; i < mapInfo->numPos; i++) {
+        mapData[mapInfo->Position[i].xLayout][mapInfo->Position[i].yLayout] = mapInfo->type;
+    }
+
+    /* 在地图显示每位玩家标记 */
+    GetElementEachOfList(mapInfo->playerList, tmp, cur) {
+        player = MapTheListEntry(ELM_Player, cur, listEntry);
+        mapData[player->pos.xLayout][player->pos.yLayout] = player->maptType;
+    }
+
+    for (i = 0; i < mapInfo->width; i++) {
+        printf("%s\n", mapData[i]);
+    }
+
+    for (i = 0; i < mapInfo->width; i++) {
+        free(mapData[i]);
+    }
+    free(mapData);
     return;
 }
 
@@ -58,6 +72,7 @@ int MAP_InitModule(void* ctx)
         LOG_TRESS(TRC_LEVEL_ERROR, "Init the map module is failed.\n");
         return DFW_FAILED;
 	}
+    mapInfo->playerList = ELM_GetPlayerInfo();
     LOG_TRESS(TRC_LEVEL_INFO, "Init the map module is success.\n");
     return DFW_SUCCESS;
 }

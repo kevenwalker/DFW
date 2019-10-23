@@ -4,7 +4,7 @@
  */
 #include "elm_player.h"
 int ELM_gPlayerAmount = 0; /* 游戏玩家的总人数 */
-ListEntry ELM_gAllPlayersList; /* 全部游戏玩家的总链表 */
+ListEntry ELM_gAllPlayersList = {&ELM_gAllPlayersList, &ELM_gAllPlayersList}; /* 全部游戏玩家的总链表 */
 
 
 /* 获取游戏玩家的总人数 */
@@ -47,6 +47,7 @@ void ELM_CreatePlayer(void)
         sprintf(player->id, "%d", i);
         player->pos.xLayout = 0;
         player->pos.yLayout = 0;
+        player->maptType = '0' + i;
         LOG_TRESS(TRC_LEVEL_INFO, "Store the play {0x%p} entrylist {0x%p}.\n", player, &(player->listEntry));
         INTF_MISC_InsertListToTail(&(player->listEntry), &ELM_gAllPlayersList);
     }

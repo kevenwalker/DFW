@@ -18,6 +18,7 @@ typedef struct {
     char id[2];
     char playerName[12]; /* 玩家名字 */
     ELM_Postion pos; /* 玩家位置 */
+    char maptType; /* 玩家在地图上的显示标记 */
 } ELM_Player;
 
 int ELM_GetPlayerNum(void);

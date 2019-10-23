@@ -7,6 +7,7 @@ typedef struct {
     int width;  /* 地图高 */
     ELM_Postion *Position; /* 地图一维坐标 */
     int numPos; /* 地图一维坐标总数 */
+    ListEntry *playerList; /* 玩家总链表数据入口 */
 } MapInfo;
 
 MapInfo* INTF_MAP_getMap(void);
