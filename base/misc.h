@@ -22,7 +22,7 @@ typedef struct tag_ListEntry {
         (_list) = (_list)->next, (_cur) = (_list))
 
 #define MapTheListEntry(type, entry, member) \
-    ((type*)((entry) - (int)(&((type*)(0))->member)))
+    ((type*)((entry) - (unsigned long long)(&((type*)(0))->member)))
 
 void INTF_MISC_FreeDobulePoint(char **point, int num);
 int INTF_MISC_DivideStringBySymbol(char *srcStr, char symbol, char ***destStr, int *strNum);

@@ -47,6 +47,23 @@ int MISC_GetSubStringNum(char* srcStr, int srcStrLen, char symbol)
     return count;
 }
 
+/* 去除字符串结尾可能存在的换行符 */
+void MISC_PurnString(char *srcStr, int len)
+{
+    int i;
+    if (srcStr == NULL || len <= 0) {
+        LOG_TRESS(TRC_LEVEL_WARN, "Input the parameter is invalid.\n");
+        return;
+    }
+
+    for (i = len - 1; i >= 0; i--) {
+        if (srcStr[i] == '\n') {
+            srcStr[i] = 0;
+        }
+    }
+    return;
+}
+
 /* 输入指定的字符串，输出以空格为分割符的子串，调用者负责保证空间释放 */
 void MISC_ParseString(char* srcStr, char** destStr, int subStrNUM, char symbol)
 {
@@ -57,6 +74,7 @@ void MISC_ParseString(char* srcStr, char** destStr, int subStrNUM, char symbol)
     if (srcStr == NULL || destStr == NULL) {
         return;
     }
+    MISC_PurnString(srcStr, strlen(srcStr));
     for (i = 0; i < subStrNUM; i++) {
         memset(destStr[i], 0, 32);
         for (j = start - srcStr; j < strlen(srcStr); j++) {

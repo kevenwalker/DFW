@@ -41,7 +41,7 @@ void LOG_GetTime(void)
     tmpStr += strlen(g_displayBuf);
     time (&t); /* 获取Unix时间戳 */
     lt = localtime (&t); /* 转为时间结构 */
-    sprintf(tmpStr, "%d-%d-%d %d:%d:%d",
+    sprintf(tmpStr, "[%d-%d-%d %d:%d:%d]",
         lt->tm_year + 1900, /* 按照接口设计, 起始年份从1900开始 */
         lt->tm_mon + 1,
         lt->tm_mday,

@@ -48,7 +48,7 @@ int CLI_INTF_main(void)
 {
     memset(g_rwBuf, 0, MAXLEN);
     printf("<Command/show help>");
-    gets(g_rwBuf);
+    fgets(g_rwBuf, MAXLEN - 1, stdin);
     return CLI_Handle();
 }
 
