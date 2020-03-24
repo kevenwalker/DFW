@@ -29,5 +29,5 @@ $(FUN):$(FUNC)
 install:
 	.\DFW.exe
 clean:
-	rm -rf *.o DFW
+	rm -rf *.o DFW messages.log
 	

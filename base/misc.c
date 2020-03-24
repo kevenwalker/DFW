@@ -317,3 +317,30 @@ int INTF_MISC_ListIsEmpty(ListEntry *head)
     return DFW_FALSE;
 }
 
+void INTF_MISC_ListDelete(ListEntry *head)
+{
+    if (head == NULL) {
+        return;
+    }
+    head->prev->next = head->next;
+    head->next->prev = head->prev;
+    head->next = head;
+    head->prev = head;
+    return;
+}
+
+/* 分配数据节点并默认初始化所有数据为0 */
+void *INTF_Zmalloc(int byte)
+{
+    void *space = NULL;
+    if (byte <= 0) {
+        return NULL;
+    }
+    space = (void *)malloc(byte);
+    if (space == NULL) {
+        return NULL;
+    }
+    memset(space, 0, byte);
+    return space;
+}
+

@@ -5,15 +5,75 @@
 #include "map_data.h"
 #include "cli_show.h"
 #include "cli_set.h"
+#include "cli_common.h"
 
 /* CLI_SHOW_PLAYER命令的界面设计 */
-#define ITEMLEN 32 /* 条目内容预分配32字节 */
-
 typedef struct {
-    int itemTotalLen;   /* 条目名称总长度 */
-    char item[ITEMLEN]; /* 条目名称 */
-    char spliter;       /* 分割符 */
-} CLI_ItemTitle;
+    ListEntry listEntry;
+    char context[CLI_CONTEXT_LEN]; // 显示的内容信息
+    char spliter;                  // 显示需要的分隔符
+    char endFlag;                  // 显示信息是否需要换行标志 1-换行；0-不换行
+    int len;                       // 显示内容总的长度
+    int offset;                    // 显示内容的偏移
+} CLI_DisplayData;
+
+static ListEntry g_displayContextList;
+
+static void CLI_StartDisplay()
+{
+    ListEntry *headList = &g_displayContextList;
+    ListEntry *tmpList = NULL;
+    ListEntry *cur = NULL;
+    CLI_DisplayData *node = NULL;
+    char buffer[CLI_BUFFER_LEN] = {0};
+    char *tmpBuf = buffer;
+
+    GetElementEachOfList(headList, tmpList, cur) {
+        node = MapTheListEntry(CLI_DisplayData, cur, listEntry);
+        INTF_MISC_ListDelete(&node->listEntry);
+        LOG_TRESS(TRC_LEVEL_DEBUG, "node{%s} offset{%d} len {%d} start to dispaly.\n",
+                  node->context, node->offset, node->len);
+        memset(tmpBuf, node->spliter, node->len);
+        sprintf(tmpBuf + node->offset, "%s", node->context);
+        *(tmpBuf + node->offset + strlen(node->context)) = node->spliter;
+        if (node->endFlag) {
+            *(tmpBuf + node->len) = '\n';
+        }
+        free(node);
+        printf("%s", buffer);
+        memset(buffer, 0, CLI_BUFFER_LEN);
+        tmpBuf = buffer;
+    }
+    return;
+}
+
+static int CLI_PrepareContext(const char *context, int length, char spliter, char endFlag)
+{
+    int ctxlen = strlen(context);
+    int idleLen;
+    CLI_DisplayData *node = NULL;
+
+    if (ctxlen > length) {
+        LOG_TRESS(TRC_LEVEL_ERROR, "context length{%d} is too long than total length{%d}.\n", ctxlen, length);
+        return DFW_FAILED;
+    }
+    /* 保持内容居中显示，显示总长度存在1个字符的调节 */
+    idleLen = (length - ctxlen) % 2 ? (length - ctxlen) : (length - ctxlen) + 1;
+
+    node = (CLI_DisplayData *)INTF_Zmalloc(sizeof(CLI_DisplayData));
+    if (node == NULL) {
+        LOG_TRESS(TRC_LEVEL_ERROR, "alloc node to display failed.\n");
+        return DFW_FAILED;
+    }
+    memcpy(node->context, context, ctxlen);
+    node->spliter = spliter;
+    node->endFlag = endFlag;
+    node->len = length;
+    node->offset = idleLen / 2;
+    INTF_MISC_InsertListToTail(&node->listEntry, &g_displayContextList);
+    LOG_TRESS(TRC_LEVEL_DEBUG, "node{%s} is insert to list success.\n", node->context);
+    return DFW_SUCCESS;
+}
 
 int CLI_showMap(char **argv, int argc);
 int CLI_showHelp(char **argv, int argc);
@@ -93,112 +153,6 @@ int CLI_showHelp(char **argv, int argc)
     return DFW_SUCCESS;
 }
 
-void CLI_DisplayContext(CLI_ItemTitle *buffer, char *curPos, int *offset)
-{
-    int margin;
-    assert(buffer != NULL);
-    assert(curPos != NULL);    
-    assert(offset != NULL);
-
-    if (strlen(buffer->item) > buffer->itemTotalLen) {
-        LOG_TRESS(TRC_LEVEL_WARN, "The source length {%d} is not enough for target length{%d}.\n",
-            buffer->itemTotalLen, buffer->item);
-        return;
-    }
-    if ((buffer->itemTotalLen - strlen(buffer->item)) % 2) {
-       buffer->itemTotalLen += 1;
-    }
-    margin = (buffer->itemTotalLen - strlen(buffer->item)) / 2 - 1;
-    memset(curPos, buffer->spliter, buffer->itemTotalLen);
-    sprintf(curPos + margin, "%s", buffer->item);
-    curPos[margin + strlen(buffer->item)] = buffer->spliter;
-    curPos[buffer->itemTotalLen] = '\0';
-    *offset = buffer->itemTotalLen;
-    return;
-}
-
-/* 打印指定数目的相同字符 */
-void CLI_DisplaySpecficCharater(int num, char charater)
-{
-    int i = num;
-    while (i > 0) {
-        printf("%c", charater);
-        i--;
-    }
-    printf("\n");
-    return;
-}
-
-/* 
- * 配置显示内容
- * info：需要输出的显示格式信息
- * item：需要显示的具体内容
- * itemLen：设计显示内容的行宽
- * spliter：不足总行宽需要填充的字符
- */
-void CLI_ConfigureInfoDisplay(CLI_ItemTitle *info, char *item, int itemLen, char spliter)
-{
-    assert(info != NULL);
-    assert(item != NULL);
-    
-    strcpy(info->item, item);
-    info->itemTotalLen = itemLen;
-    info->spliter = spliter;
-    return;
-}
-
-/* 打印显示内容 */
-void CLI_PrintInfoDisplay(CLI_ItemTitle *info, int cnt, int *width)
-{
-    char *disBuf = NULL;
-    char *tmp = NULL;
-    int i;
-    int size = 0;
-    int offset = 0;
-    assert(info != NULL);
-
-    for (i = 0; i < cnt; i++) {
-        size += info[i].itemTotalLen;
-    }
-    size += cnt;
-
-    disBuf = (char*)malloc(sizeof(char) * size);
-    if (disBuf == NULL) {
-        LOG_TRESS(TRC_LEVEL_ERROR, "Alloc the buffer for display context failed.\n");
-        return;
-    }
-
-    tmp = disBuf;
-    for (i = 0; i < cnt; i++) {
-        CLI_DisplayContext(&info[i], tmp, &offset);
-        tmp = tmp + offset;
-    }
-    if (width != NULL) {
-        *width = tmp - disBuf;
-    }
-    printf("%s\n", disBuf);
-    free(disBuf);
-    return;
-}
-
-/* 打印显示全部player信息头 */
-void CLI_DisplayPlayerInfoHead(void)
-{
-    int width = 0;
-    CLI_ItemTitle buf[3];
-
-    /* 配置ID条目 */
-    CLI_ConfigureInfoDisplay(&buf[0], "ID", 6, ' ');
-    /* 配置Name条目 */
-    CLI_ConfigureInfoDisplay(&buf[1], "Name", 12, ' ');
-    /* 配置当前位置 */
-    CLI_ConfigureInfoDisplay(&buf[2], "Current Position", 20, ' ');
-
-    CLI_PrintInfoDisplay(buf, 3, &width);
-    CLI_DisplaySpecficCharater(width, '-');
-    return;
-}
-
 /* 显示所有玩家的基本信息 */
 int CLI_ShowPlayers(char **argv, int argc)
 {
@@ -207,29 +161,29 @@ int CLI_ShowPlayers(char **argv, int argc)
     ListEntry *tmp = NULL;
     ListEntry *cur = NULL;
     ELM_Player *player = NULL;
-    int i = 0;
-    CLI_ItemTitle buf[3];
     char tmpBuf[10];
     playerNum = ELM_GetPlayerNum();
     if (playerNum == 0) {
         printf("Can not find any players.\n");
         return DFW_SUCCESS;
     }
-    CLI_DisplayPlayerInfoHead();
+
+    INTF_MISC_InitlizeHeadList(&g_displayContextList);
+    CLI_PrepareContext("ID", 6, ' ', 0);
+    CLI_PrepareContext("Name", 12, ' ', 0);
+    CLI_PrepareContext("Current Position", 20, ' ', 1);
+    CLI_PrepareContext("", 38, '-', 1);
     head = ELM_GetPlayerInfo();
-    if (head == NULL) {
-        LOG_TRESS(TRC_LEVEL_ERROR, "Get internal players list failed.\n");
-        return DFW_FAILED;
-    }
     GetElementEachOfList(head, tmp, cur) {
         player = MapTheListEntry(ELM_Player, cur, listEntry);
-        CLI_ConfigureInfoDisplay(&buf[0], player->id, 6, ' ');
-        CLI_ConfigureInfoDisplay(&buf[1], player->playerName, 12, ' ');
+        CLI_PrepareContext(player->id, 6, ' ', 0);
+        CLI_PrepareContext(player->playerName, 12, ' ', 0);
         memset(tmpBuf, 0, 10);
         sprintf(tmpBuf, "%d %d", player->pos.xLayout, player->pos.yLayout);
-        CLI_ConfigureInfoDisplay(&buf[2], tmpBuf, 20, ' ');
-        CLI_PrintInfoDisplay(buf, 3, NULL);
+        CLI_PrepareContext(tmpBuf, 20, ' ', 1);
     }
+    CLI_PrepareContext("", 38, '-', 1);
+    CLI_StartDisplay();
     return DFW_SUCCESS;
 }
 

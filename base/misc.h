@@ -18,8 +18,8 @@ typedef struct tag_ListEntry {
 } ListEntry;
 
 #define GetElementEachOfList(_head, _list, _cur) \
-    for ((_list) = (_head)->next, (_cur) = (_list); (_list) != (_head); \
-        (_list) = (_list)->next, (_cur) = (_list))
+    for ((_list) = (_head)->next, (_cur) = (_list), (_list) = (_list)->next; (_cur) != (_head); \
+        (_cur) = (_list), (_list) = (_list)->next)
 
 #define MapTheListEntry(type, entry, member) \
     ((type*)((entry) - (unsigned long long)(&((type*)(0))->member)))
@@ -31,6 +31,8 @@ int INTF_MISC_GetStringByCharacter(char *srcStr, int strLen, int direct, char ct
 void INTF_MISC_InsertListToTail(ListEntry *dst, ListEntry *head);
 void INTF_MISC_InitlizeHeadList(ListEntry *head);
 int INTF_MISC_ListIsEmpty(ListEntry *head);
+void INTF_MISC_ListDelete(ListEntry *head);
+void *INTF_Zmalloc(int byte);
 
 
 
