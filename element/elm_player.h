@@ -7,21 +7,8 @@
 #include "cli_help.h"
 #include "common.h"
 #include "misc.h"
-
-typedef struct {
-    int xLayout; /* 横坐标 */
-    int yLayout; /* 纵坐标 */
-} ELM_Postion;
-
-typedef struct {
-    ListEntry listEntry;
-    char id[2];
-    char playerName[12]; /* 玩家名字 */
-    ELM_Postion pos; /* 玩家位置 */
-    char maptType; /* 玩家在地图上的显示标记 */
-} ELM_Player;
+#include "elm_bomb.h"
 
 int ELM_GetPlayerNum(void);
 void ELM_SetPlayerNum(int num);
-ListEntry* ELM_GetPlayerInfo(void);
 #endif

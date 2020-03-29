@@ -165,7 +165,8 @@ int CLI_SetPlayerSteps(char **argv, int argc)
     GetElementEachOfList(head, tmp, cur) {
         player = MapTheListEntry(ELM_Player, cur, listEntry);
         if (strcmp(player->playerName, name) == 0) {
-            INTF_MAP_GetPosition(&(player->pos), atoi(step), &(player->pos));
+            INTF_MAP_GetPosition(&(player->pos), atoi(step), &(player->pos), &player->index);
+            INTF_MAP_GetAttributeForPlayer(player->index, &player->package);
         }
     }
     printf("Execute the command is success.\n");

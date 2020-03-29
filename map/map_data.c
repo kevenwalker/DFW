@@ -1,5 +1,6 @@
 #include "map_data.h"
-MapInfo g_defaultMap = {'#', 20, 6, NULL, 0};
+MapInfo g_defaultMap = {'#', 20, 6, NULL, 0, NULL, NULL};
+MapAttributeInfo g_defaultMapAttributeInfo;
 
 void INTF_MAP_CreatePosition(void)
 {
@@ -73,8 +74,48 @@ int MAP_GetPositionIndex(ELM_Postion *curPos)
     return 0;
 }
 
+int MAP_PickAttributeFromMapToPlayer(MapAttribute *attrDataInfo, ELM_PlayerPackage *package)
+{
+    ELM_STUFF *stuff = NULL;
+
+    stuff = (ELM_STUFF *)INTF_Zmalloc(sizeof(ELM_STUFF));
+    if (stuff == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "Pick attribute{%s} from map to player failed.\n", attrDataInfo->stuffName);
+        return DFW_FAILED;
+    }
+    sprintf(stuff->stuffName, "%s", attrDataInfo->stuffName);
+    stuff->range = attrDataInfo->range;
+    stuff->stuffHandle = NULL;
+    INTF_MISC_InsertListToTail(&stuff->package, &package->stuffHead);
+    package->tools++;
+    LOG_TRESS(TRC_LEVEL_INFO, "Pick attribute{%s} from map to player success.\n", stuff->stuffName);
+    return DFW_SUCCESS;
+}
+
+/* 入参index是地图的一维坐标 */
+void INTF_MAP_GetAttributeForPlayer(int index, ELM_PlayerPackage *package)
+{
+    ListEntry *listHead = &(g_defaultMap.attrInfo->attrList);
+    ListEntry *tmpList = NULL;
+    ListEntry *curLits = NULL;
+    MapAttribute *attrDataInfo = NULL;
+    char buffer[BUFFLEN] = {0};
+
+    GetElementEachOfList(listHead, tmpList, curLits) {
+        attrDataInfo = MapTheListEntry(MapAttribute, curLits, listEntry);
+        if (attrDataInfo->mapPos == index && attrDataInfo->avaliable == DFW_TRUE) {
+            sprintf(buffer, "Do you want to get %s rank %d ? [Y/N]", attrDataInfo->stuffName, attrDataInfo->rank);
+            if (INTF_PrintfYesOrNo(buffer) == DFW_TRUE) {
+                if (MAP_PickAttributeFromMapToPlayer(attrDataInfo, package) == DFW_SUCCESS) {
+                    attrDataInfo->avaliable = DFW_FALSE;
+                }
+            }
+        }
+    }
+}
+
 /* 通过给定的位移获取下一个地图坐标数据 */
-int INTF_MAP_GetPosition(ELM_Postion *curPos, int step, ELM_Postion *dstPos)
+int INTF_MAP_GetPosition(ELM_Postion *curPos, int step, ELM_Postion *dstPos, int *posIndex)
 {
     int index;
     if (curPos == NULL || dstPos == NULL) {
@@ -89,6 +130,7 @@ int INTF_MAP_GetPosition(ELM_Postion *curPos, int step, ELM_Postion *dstPos)
     }
     dstPos->xLayout = g_defaultMap.Position[index].xLayout;
     dstPos->yLayout = g_defaultMap.Position[index].yLayout;
+    *posIndex = index;
     return DFW_SUCCESS;
 }
 
@@ -109,6 +151,106 @@ void INTF_MAP_DisplayDataInfo(void)
         j++;
     }
     printf("\n");
+    return;
+}
+
+MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
+{
+    MapAttribute *attr = NULL;
+    g_defaultMapAttributeInfo.attrNum = 0;
+    INTF_MISC_InitlizeHeadList(&g_defaultMapAttributeInfo.attrList);
+
+    /* 第一个为BOMB_COMMON */
+    attr = (MapAttribute *)INTF_Zmalloc(sizeof(MapAttribute));
+    if (attr == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "creat a BOMB_COMMON failed.\n")
+    }
+    attr->avaliable = DFW_TRUE;
+    attr->display = DFW_FALSE;
+    attr->mapPos = 17;
+    attr->range = 4;
+    attr->rank = BOMB_COMMON;
+    sprintf(attr->stuffName, "%s", "Bomb");
+    INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
+    g_defaultMapAttributeInfo.attrNum++;
+
+    /* 第二个为BOMB_MINOR */
+    attr = (MapAttribute *)INTF_Zmalloc(sizeof(MapAttribute));
+    if (attr == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "creat a BOMB_MINOR failed.\n")
+    }
+    attr->avaliable = DFW_TRUE;
+    attr->display = DFW_FALSE;
+    attr->mapPos = 23;
+    attr->range = 8;
+    attr->rank = BOMB_MINOR;
+    sprintf(attr->stuffName, "%s", "Bomb");
+    INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
+    g_defaultMapAttributeInfo.attrNum++;
+
+    /* 第三个为BOMB_MAJOR */
+    attr = (MapAttribute *)INTF_Zmalloc(sizeof(MapAttribute));
+    if (attr == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "creat a BOMB_MAJOR failed.\n")
+    }
+    attr->avaliable = DFW_TRUE;
+    attr->display = DFW_FALSE;
+    attr->mapPos = 37;
+    attr->range = 16;
+    attr->rank = BOMB_MAJOR;
+    sprintf(attr->stuffName, "%s", "Bomb");
+    INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
+    g_defaultMapAttributeInfo.attrNum++;
+
+    /* 第四个为BOMB_SUPER */
+    attr = (MapAttribute *)INTF_Zmalloc(sizeof(MapAttribute));
+    if (attr == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "creat a BOMB_SUPER failed.\n")
+    }
+    attr->avaliable = DFW_TRUE;
+    attr->display = DFW_FALSE;
+    attr->mapPos = 42;
+    attr->range = -1;
+    attr->rank = BOMB_SUPER;
+    sprintf(attr->stuffName, "%s", "Bomb");
+    INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
+    g_defaultMapAttributeInfo.attrNum++;
+
+    /* 第五个为BOMB_COMMON */
+    attr = (MapAttribute *)INTF_Zmalloc(sizeof(MapAttribute));
+    if (attr == NULL) {
+        LOG_TRESS(TRC_LEVEL_WARN, "creat a BOMB_COMMON failed.\n")
+    }
+    attr->avaliable = DFW_TRUE;
+    attr->display = DFW_FALSE;
+    attr->mapPos = 7;
+    attr->range = 4;
+    attr->rank = BOMB_COMMON;
+    sprintf(attr->stuffName, "%s", "Bomb");
+    INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
+    g_defaultMapAttributeInfo.attrNum++;
+
+    LOG_TRESS(TRC_LEVEL_INFO, "init map attribute {%d} success.\n", g_defaultMapAttributeInfo.attrNum);
+    return &g_defaultMapAttributeInfo;
+}
+
+void INTF_MAP_FreeAttributeInfo(MapAttributeInfo *attrInfo)
+{
+    ListEntry *headList = NULL;
+    ListEntry *tmpList = NULL;
+    ListEntry *cur = NULL;
+    MapAttribute *node = NULL;
+    if (attrInfo == NULL) {
+        return;
+    }
+
+    headList = &attrInfo->attrList;
+    GetElementEachOfList(headList, tmpList, cur) {
+        node = MapTheListEntry(MapAttribute, cur, listEntry);
+        INTF_MISC_ListDelete(&node->listEntry);
+        free(node);
+    }
+    LOG_TRESS(TRC_LEVEL_INFO, "destory map attribute success.\n");
     return;
 }
 

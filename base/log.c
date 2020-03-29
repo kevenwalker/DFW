@@ -1,5 +1,5 @@
 #include "log.h"
-#define STRLEN 32
+#define STRLEN 64
 #define CTXLEN 512
 #define DISLEN 1024
 

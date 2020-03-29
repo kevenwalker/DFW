@@ -33,7 +33,6 @@ void INTF_MISC_InitlizeHeadList(ListEntry *head);
 int INTF_MISC_ListIsEmpty(ListEntry *head);
 void INTF_MISC_ListDelete(ListEntry *head);
 void *INTF_Zmalloc(int byte);
-
-
+int INTF_PrintfYesOrNo(const char *buffer);
 
 #endif

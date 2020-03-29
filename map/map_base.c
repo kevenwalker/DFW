@@ -62,6 +62,7 @@ int MAP_ReleaseMap(MapInfo** mapInfo)
     }
     free((*mapInfo)->Position);
     (*mapInfo)->Position = NULL;
+    INTF_MAP_FreeAttributeInfo((*mapInfo)->attrInfo);
     return DFW_SUCCESS;
 }
 
@@ -73,6 +74,7 @@ int MAP_InitModule(void* ctx)
         return DFW_FAILED;
 	}
     mapInfo->playerList = ELM_GetPlayerInfo();
+    mapInfo->attrInfo = INTF_MAP_GetAttributeInfo();
     LOG_TRESS(TRC_LEVEL_INFO, "Init the map module is success.\n");
     return DFW_SUCCESS;
 }

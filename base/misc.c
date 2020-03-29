@@ -344,3 +344,19 @@ void *INTF_Zmalloc(int byte)
     return space;
 }
 
+/* 给出选择提示，用于用户选择，Y-DFW_TRUE, N-DFW_FALSE */
+int INTF_PrintfYesOrNo(const char *buffer)
+{
+    char ch;
+    do {
+    printf("%s\n", buffer);
+    ch = getchar();
+    fflush(stdin);
+    } while (ch != 'Y' && ch != 'y' && ch != 'n' && ch != 'N');
+
+    if (ch == 'Y' || ch == 'y') {
+        return DFW_TRUE;
+    }
+    return DFW_FALSE;
+}
+
