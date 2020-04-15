@@ -171,8 +171,10 @@ int CLI_ShowPlayers(char **argv, int argc)
     INTF_MISC_InitlizeHeadList(&g_displayContextList);
     CLI_PrepareContext("ID", 6, ' ', 0);
     CLI_PrepareContext("Name", 12, ' ', 0);
-    CLI_PrepareContext("Current Position", 20, ' ', 1);
-    CLI_PrepareContext("", 38, '-', 1);
+    CLI_PrepareContext("Current Position", 20, ' ', 0);
+    CLI_PrepareContext("Packages", 12, ' ', 1);
+    CLI_PrepareContext("", 50, '-', 1);
+
     head = ELM_GetPlayerInfo();
     GetElementEachOfList(head, tmp, cur) {
         player = MapTheListEntry(ELM_Player, cur, listEntry);
@@ -180,9 +182,12 @@ int CLI_ShowPlayers(char **argv, int argc)
         CLI_PrepareContext(player->playerName, 12, ' ', 0);
         memset(tmpBuf, 0, 10);
         sprintf(tmpBuf, "%d %d", player->pos.xLayout, player->pos.yLayout);
-        CLI_PrepareContext(tmpBuf, 20, ' ', 1);
+        CLI_PrepareContext(tmpBuf, 20, ' ', 0);
+        memset(tmpBuf, 0, 10);
+        sprintf(tmpBuf, "%d", player->package.tools);
+        CLI_PrepareContext(tmpBuf, 12, ' ', 1);
     }
-    CLI_PrepareContext("", 38, '-', 1);
+    CLI_PrepareContext("", 50, '-', 1);
     CLI_StartDisplay();
     return DFW_SUCCESS;
 }

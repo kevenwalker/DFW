@@ -351,7 +351,7 @@ int INTF_PrintfYesOrNo(const char *buffer)
     do {
     printf("%s\n", buffer);
     ch = getchar();
-    fflush(stdin);
+    getchar();
     } while (ch != 'Y' && ch != 'y' && ch != 'n' && ch != 'N');
 
     if (ch == 'Y' || ch == 'y') {

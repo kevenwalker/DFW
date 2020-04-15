@@ -18,8 +18,21 @@ struct ELM_BombRangeConfigure       {
     {BOMB_SUPER, RANGE_SUPER}
 };
 
+/* 将目标玩家的当前位置后移4个位置，如果移动的4个位置中含有原点坐标，则移动到原点 */
 static void ELM_BombCommonHandle(void *ctx)
 {
+    ELM_Player *player = NULL;
+
+    player = (ELM_Player *)ctx;
+    if (player == NULL) {
+        LOG_TRESS(TRC_LEVEL_ERROR, "the input parameter is invalid.\n");
+        return;
+    }
+    if (player->index - RANGE_COMMON < 0) {
+        player->index = 0;
+    } else {
+        player->index -= RANGE_COMMON;
+    }
     return;
 }
 
