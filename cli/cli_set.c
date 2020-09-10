@@ -4,7 +4,6 @@
  */
 
 #include "cli_set.h"
-#define PARAMLEN 20
 int CLI_SetQuit(char **argv, int argc);
 int CLI_SetPalyerNumbers(char **argv, int argc);
 int CLI_SetPlayerSteps(char **argv, int argc);

@@ -153,8 +153,7 @@ int CLI_showHelp(char **argv, int argc)
     return DFW_SUCCESS;
 }
 
-/* 显示所有玩家的基本信息 */
-int CLI_ShowPlayers(char **argv, int argc)
+int CLI_ShowAllPlayers(char **argv, int argc)
 {
     int playerNum;
     ListEntry *head = NULL;
@@ -189,6 +188,70 @@ int CLI_ShowPlayers(char **argv, int argc)
     }
     CLI_PrepareContext("", 50, '-', 1);
     CLI_StartDisplay();
+    return DFW_SUCCESS;
+}
+
+int CLI_ShowSpecificPlayerInfo(char **argv, int argc)
+{
+    int result;
+    int val;
+    char cmdVal[PARAMLEN] = {0};
+    ListEntry *head = NULL;
+    ListEntry *tmp = NULL;
+    ListEntry *cur = NULL;
+    ELM_Player *player = NULL;
+    char findFlag = 'N';
+
+    result = INTF_MISC_GetParamByEqual(argv[0], strlen(argv[0]), MISC_BEFORE, cmdVal, PARAMLEN);
+    if (result != DFW_SUCCESS) {
+        printf("Execute the command is failed.\n");
+        return DFW_SUCCESS;
+    }
+
+    if (strcmp(cmdVal, CLI_SHOW_PLAYER_ID) != 0) {
+        LOG_TRESS(TRC_LEVEL_WARN, "Can not find the cmd {%s} to excute.\n", cmdVal);
+        return DFW_SUCCESS;
+    }
+
+    result = INTF_MISC_GetParamByEqual(argv[0], strlen(argv[0]), MISC_AFTER, cmdVal, PARAMLEN);
+    if (result != DFW_SUCCESS) {
+        printf("Execute the command is failed.\n");
+        return DFW_SUCCESS;
+    }
+
+    val = atoi(cmdVal);
+    head = ELM_GetPlayerInfo();
+    GetElementEachOfList(head, tmp, cur) {
+        player = MapTheListEntry(ELM_Player, cur, listEntry);
+        if (atoi(player->id) == val) {
+            findFlag = 'Y';
+            INTF_MISC_InitlizeHeadList(&g_displayContextList);
+            CLI_PrepareContext("", 50, '-', 1);
+            CLI_PrepareContext("Name:", 12, ' ', 0);
+            CLI_PrepareContext(player->playerName, 12, ' ', 1);
+            CLI_PrepareContext("", 50, '-', 1);
+            CLI_StartDisplay();
+        }
+    }
+
+    if (findFlag == 'N') {
+        printf("Can not find the id %d of player.\n", val);
+        return DFW_SUCCESS;
+    }
+    return DFW_SUCCESS;
+}
+
+
+/* 显示所有玩家的基本信息 */
+int CLI_ShowPlayers(char **argv, int argc)
+{
+    assert(argv != NULL);
+    if (argc == 1) {
+        return CLI_ShowAllPlayers(argv, argc);
+    }
+    if (argc ==2) {
+        return CLI_ShowSpecificPlayerInfo(argv + 1, argc - 1);
+    }
     return DFW_SUCCESS;
 }
 

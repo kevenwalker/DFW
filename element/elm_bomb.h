@@ -9,13 +9,15 @@ typedef struct {
     char type;    // 炸弹类型
     int range;    // 炸弹攻击的有效范围
     int owner;    // 炸弹的拥有者编号
-    void (*BombHandle)(void *ctx); // 炸弹需要的一些私有处理操作
+    int (*BombHandle)(void *ctx); // 炸弹需要的一些私有处理操作
 } ELM_Bomb;
 
 typedef struct {
     int type;
-    void (*BombHandle)(void *ctx);
+    int (*BombHandle)(void *ctx);
 } ELM_BombOps;
+
+
 
 #endif
 

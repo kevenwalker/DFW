@@ -85,7 +85,7 @@ int MAP_PickAttributeFromMapToPlayer(MapAttribute *attrDataInfo, ELM_PlayerPacka
     }
     sprintf(stuff->stuffName, "%s", attrDataInfo->stuffName);
     stuff->range = attrDataInfo->range;
-    stuff->stuffHandle = NULL;
+    stuff->stuffHandle = attrDataInfo->attrHandle;
     INTF_MISC_InsertListToTail(&stuff->package, &package->stuffHead);
     package->tools++;
     LOG_TRESS(TRC_LEVEL_INFO, "Pick attribute{%s} from map to player success.\n", stuff->stuffName);
@@ -134,6 +134,7 @@ int INTF_MAP_GetPosition(ELM_Postion *curPos, int step, ELM_Postion *dstPos, int
     return DFW_SUCCESS;
 }
 
+/* 显示地图的详细信息 */
 void INTF_MAP_DisplayDataInfo(void)
 {
     int i;
@@ -150,6 +151,7 @@ void INTF_MAP_DisplayDataInfo(void)
         }
         j++;
     }
+    printf("Map Total of Tools: %d\n", g_defaultMap.attrInfo->attrNum);
     printf("\n");
     return;
 }
@@ -170,6 +172,7 @@ MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
     attr->mapPos = 17;
     attr->range = 4;
     attr->rank = BOMB_COMMON;
+    attr->attrHandle = ELM_BombGetHandle(BOMB_COMMON);
     sprintf(attr->stuffName, "%s", "Bomb");
     INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
     g_defaultMapAttributeInfo.attrNum++;
@@ -184,6 +187,7 @@ MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
     attr->mapPos = 23;
     attr->range = 8;
     attr->rank = BOMB_MINOR;
+    attr->attrHandle = ELM_BombGetHandle(BOMB_MINOR);
     sprintf(attr->stuffName, "%s", "Bomb");
     INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
     g_defaultMapAttributeInfo.attrNum++;
@@ -198,6 +202,7 @@ MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
     attr->mapPos = 37;
     attr->range = 16;
     attr->rank = BOMB_MAJOR;
+    attr->attrHandle = ELM_BombGetHandle(BOMB_MAJOR);
     sprintf(attr->stuffName, "%s", "Bomb");
     INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
     g_defaultMapAttributeInfo.attrNum++;
@@ -212,6 +217,7 @@ MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
     attr->mapPos = 42;
     attr->range = -1;
     attr->rank = BOMB_SUPER;
+    attr->attrHandle = ELM_BombGetHandle(BOMB_SUPER);
     sprintf(attr->stuffName, "%s", "Bomb");
     INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
     g_defaultMapAttributeInfo.attrNum++;
@@ -226,6 +232,7 @@ MapAttributeInfo *INTF_MAP_GetAttributeInfo(void)
     attr->mapPos = 7;
     attr->range = 4;
     attr->rank = BOMB_COMMON;
+    attr->attrHandle = ELM_BombGetHandle(BOMB_COMMON);
     sprintf(attr->stuffName, "%s", "Bomb");
     INTF_MISC_InsertListToTail(&attr->listEntry, &g_defaultMapAttributeInfo.attrList);
     g_defaultMapAttributeInfo.attrNum++;

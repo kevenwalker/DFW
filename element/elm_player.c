@@ -50,7 +50,7 @@ void ELM_CreatePlayer(void)
             LOG_TRESS(TRC_LEVEL_ERROR, "Create player datainfo failed.\n");
             break;
         }
-        sprintf(player->playerName, "Player%d", i);
+        sprintf(player->playerName, "player%d", i);
         sprintf(player->id, "%d", i);
         player->index = 0;
         player->pos.xLayout = 0;

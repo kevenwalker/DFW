@@ -9,6 +9,7 @@
 #include "misc.h"
 #include "elm_player.h"
 #include "map_data.h"
+#include "cli_common.h"
 int INTF_RunSetHandle(char **argv, int argc);
 void INTF_ShowSetHelpInfo(void);
 #endif

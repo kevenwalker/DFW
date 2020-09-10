@@ -60,4 +60,6 @@ enum ELM_BombType {
 };
 
 ListEntry* ELM_GetPlayerInfo(void);
+void *ELM_BombGetHandle(int type);
+
 #endif

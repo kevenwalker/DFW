@@ -7,6 +7,7 @@
 #include "misc.h"
 #define CLI_CONTEXT_LEN 128
 #define CLI_BUFFER_LEN 512
+#define PARAMLEN 20
 
 
 #endif

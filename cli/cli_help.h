@@ -10,12 +10,14 @@
 #define CLI_SHOW_HELP "help"
 #define CLI_SHOW_VERSION "version"
 #define CLI_SHOW_PLAYER "player"
+#define CLI_SHOW_PLAYER_ID "id"
 /* show¿‡√¸¡Ó∞Ô÷˙ */
 #define CLI_SHOW_MAP_HELP       "show map [verbose]               -- print the map data info.\n" \
                                 "                                 -- verbose is optional.\n"
 #define CLI_SHOW_HELP_INFO      "show help                        -- print the help info.\n"
 #define CLI_SHOW_VERSION_INFO   "show version                     -- print the version.\n"
-#define CLI_SHOW_PLAYER_INFO    "show player                      -- print all the players info.\n"
+#define CLI_SHOW_PLAYER_INFO    "show player [id=ID]              -- print all the players info.\n" \
+                                "                                 -- print specific id player info.\n"
 /* set¿‡√¸¡Ó */
 #define CLI_SET_QUIT "quit"
 #define CLI_SET_PLAYER_NUMBER "player_count"
